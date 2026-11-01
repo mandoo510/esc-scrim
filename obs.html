@@ -80,13 +80,13 @@ body.preview{background:repeating-conic-gradient(#2a2d33 0 25%,#1f2226 0 50%) 0 
   // ── 스크림 종류(로고) ──
   function applyBrand(b){
     var n = b === 'ladies' ? 'ladies' : 'esc', alt = n === 'ladies' ? 'ESC LADIES SCRIM' : 'ESC SCRIM';
-    try { localStorage.setItem('esc_brand', n); } catch (e) {}
+    try { localStorage.setItem('esc_brand_' + (ID || 'live'), n); } catch (e) {}
     [].forEach.call(document.querySelectorAll('img[data-logo]'), function(im){
       var src = 'assets/logo-' + n + (im.getAttribute('data-logo') === 'sm' ? '-sm' : '') + '.png?v=6';
       if (im.getAttribute('src') !== src){ im.src = src; im.alt = alt; }
     });
   }
-  try { applyBrand(localStorage.getItem('esc_brand')); } catch (e) { applyBrand('esc'); }
+  try { applyBrand(localStorage.getItem('esc_brand_' + (ID || 'live'))); } catch (e) { applyBrand('esc'); }
 
   function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function api(p){ p._ = Date.now(); return fetch(API + '?' + new URLSearchParams(p), { credentials: 'omit', cache: 'no-store' }).then(function(r){ return r.json(); }).then(function(j){ if (j && j.error) throw new Error(j.error); return j; }); }
