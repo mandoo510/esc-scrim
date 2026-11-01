@@ -409,7 +409,7 @@ body.obs .obs-head{display:flex}
 <script>
 (function(){
   var API = 'https://script.google.com/macros/s/AKfycbzJpd737Mo8J2tegE1xXX_sYjp7AiezjTcb7Qf2ggbSKvtYv_amYUSsMRFnL-NjDwmkeQ/exec';
-  var DEFAULT_ID = '1aNuWrDacxbF6_IkwmxXzc-y88YSGJ_20zs6xprR4eVo';
+  var DEFAULT_ID = ''; // 비워 두면 관리자 페이지에서 정한 '진행 중' 시트를 따라가요
   var REFRESH = 10000;
 
   var q = new URLSearchParams(location.search);
@@ -598,8 +598,10 @@ body.obs .obs-head{display:flex}
     api({ api: 'list' }).then(function(list){
       if (!list || list.length < 2) return;
       var p = $('pick');
-      if (!list.some(function(x){ return x.id === ID; })) list.unshift({ id: ID, name: '현재 시트' });
-      p.innerHTML = list.map(function(x){ return '<option value="' + esc(x.id) + '"' + (x.id === ID ? ' selected' : '') + '>' + esc(x.name) + '</option>'; }).join('');
+      var live = (list.filter(function(x){ return x.cur; })[0] || list[0]).id, cur = ID || live;
+      p.dataset.cur = live;
+      if (!list.some(function(x){ return x.id === cur; })) list.unshift({ id: cur, name: '현재 시트' });
+      p.innerHTML = list.map(function(x){ return '<option value="' + esc(x.id) + '"' + (x.id === cur ? ' selected' : '') + '>' + esc(x.name) + (x.cur ? ' · 진행 중' : '') + '</option>'; }).join('');
       p.hidden = false;
     }).catch(function(){});
   }
@@ -607,13 +609,13 @@ body.obs .obs-head{display:flex}
   $('tabs').addEventListener('click', function(e){ var b = e.target.closest('[data-m]'); if (!b) return; var m = +b.dataset.m; sel = (m === latest() && sel === null) ? null : m; render(); });
   $('mCum').onclick = function(){ mode = 'cum'; render(); };
   $('mOne').onclick = function(){ mode = 'one'; render(); };
-  $('pick').onchange = function(){ var u = new URL(location.href); u.searchParams.set('id', this.value); location.href = u.toString(); };
+  $('pick').onchange = function(){ var u = new URL(location.href); if (this.value === this.dataset.cur) u.searchParams.delete('id'); else u.searchParams.set('id', this.value); location.href = u.toString(); };
   $('full').onclick = function(){ var el = document.documentElement; if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().catch(function(){}); else if (document.exitFullscreen) document.exitFullscreen().catch(function(){}); };
 
   function obsUrl(){
     var base = new URL('obs.html', location.href), p = base.searchParams;
     p.set('v', Date.now().toString(36));
-    if (ID !== DEFAULT_ID) p.set('id', ID);
+    if (ID) p.set('id', ID);
     if ($('oMatch').value) p.set('match', $('oMatch').value);
     if ($('oMode').value) p.set('mode', $('oMode').value);
     if ($('oTop').value) p.set('top', $('oTop').value);
