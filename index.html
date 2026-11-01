@@ -583,7 +583,7 @@ body.obs .obs-head{display:flex}
   }
   function setLive(ok, t){ $('live').className = 'live' + (ok ? '' : ' off'); $('liveT').textContent = t; }
   function load(){
-    api({ api: 'board', id: ID }).then(function(d){
+    api(ID ? { api: 'board', id: ID, pin: 1 } : { api: 'board' }).then(function(d){
       var sig = JSON.stringify([d.res, d.teams, d.title, d.maps]);
       var first = !D; D = d; applyBrand(d.brand);
       setLive(true, 'LIVE · ' + d.at);

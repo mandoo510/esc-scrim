@@ -132,7 +132,7 @@ body.preview{background:repeating-conic-gradient(#2a2d33 0 25%,#1f2226 0 50%) 0 
     lastPos = {}; rows.forEach(function(r){ lastPos[r.t.n] = r.pos; });
   }
   function load(){
-    api({ api: 'board', id: ID }).then(function(d){
+    api(ID ? { api: 'board', id: ID, pin: 1 } : { api: 'board' }).then(function(d){
       var sig = JSON.stringify([d.res, d.teams, d.title, d.maps]);
       D = d; applyBrand(d.brand); if (sig !== lastSig){ lastSig = sig; render(); }
       var ids = d.teams.map(function(t){ return t.logo; }).filter(function(id){ return id && !asked[id]; });
